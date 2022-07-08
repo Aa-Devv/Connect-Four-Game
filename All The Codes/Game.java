@@ -13,15 +13,13 @@ import java.util.Random;
 
 public class Game extends Activity {
     Boolean turn = false;
-    ArrayList<Float> positionsX;
-    ArrayList<Float> positionsY;
     String[][] gameMap;
     String colorOfPlayer;
     String humanColor;
     String botColor;
     int indexForY;
     Toast t0;
-    can canvas;
+    Builder canvas;
     boolean newGame = false;
     int idForMoveAdders;
     boolean pickTheMostTolerable;
@@ -31,6 +29,7 @@ public class Game extends Activity {
     long winScore;
     long loseScore;
     long drawScore;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,28 +50,11 @@ public class Game extends Activity {
         }
         super.onCreate(savedInstanceState);
         Vault.getPositions();
-        getPositions();
-        canvas = new can(this, this);
+        canvas = new Builder(this, this);
         setContentView(canvas);
         startGame();
     }
 
-    void getPositions() {
-        Float x, y = 0f;
-        positionsX = new ArrayList<>();
-        positionsY = new ArrayList<>();
-        int height = Resources.getSystem().getDisplayMetrics().heightPixels;
-        int width = Resources.getSystem().getDisplayMetrics().widthPixels;
-        y = height / 24 + (height / 2) / 2.0f;
-        for (int i = 0; i < 6; i++, y += height / 12) {
-            positionsY.add(y);
-        }
-        x = 0f;
-        for (int j = 0; j < 7; j++, x += width / 7) {
-            Float pX = (width / 14) + x;
-            positionsX.add(pX);
-        }
-    }
 
     void startGame() {
 
@@ -201,7 +183,7 @@ public class Game extends Activity {
                 };
                 moveAdders.add(ma);
                 ma.id = idForMoveAdders++;
-                ma.m = new Move(humanColor, rf[1], positionsY.get(indexForY));
+                ma.m = new Move(humanColor, rf[1], Vault.positionsY.get(indexForY));
                 ma.start();
                 turn = false;
                 colorOfPlayer = humanColor;
@@ -222,7 +204,7 @@ public class Game extends Activity {
                 }
             } else {
 
-                if (motionEvent.getY() - tradeOff > canvas.getHeight() / 4 && motionEvent.getY() - tradeOff < (canvas.getHeight() / 2 + canvas.getHeight() / 4)) {
+                if (motionEvent.getY() - tradeOff > Vault.height / 4 && motionEvent.getY() - tradeOff < (Vault.height / 2 + Vault.height / 4)) {
                     this.runOnUiThread(new Runnable() {
                         public void run() {
                             if (t0 != null) t0.cancel();
@@ -426,13 +408,13 @@ public class Game extends Activity {
 
     int[] translate(double x, double y) {
         int[] temp = new int[2];
-        for (int i = 0; i < positionsX.size(); i++)
-            if (String.valueOf(positionsX.get(i)).equalsIgnoreCase(String.valueOf(x))) {
+        for (int i = 0; i < Vault.positionsX.size(); i++)
+            if (String.valueOf(Vault.positionsX.get(i)).equalsIgnoreCase(String.valueOf(x))) {
                 temp[0] = i;
                 break;
             }
-        for (int i = 0; i < positionsY.size(); i++)
-            if (String.valueOf(positionsY.get(i)).equalsIgnoreCase(String.valueOf(y))) {
+        for (int i = 0; i < Vault.positionsY.size(); i++)
+            if (String.valueOf(Vault.positionsY.get(i)).equalsIgnoreCase(String.valueOf(y))) {
                 temp[1] = i;
                 break;
             }
@@ -442,13 +424,13 @@ public class Game extends Activity {
 
     float[] correctMove(double x, double y) {
         float[] rF = new float[3];
-        for (int i = 0; i < positionsX.size(); i++) {
-            if (x == positionsX.get(i) || (x <= (positionsX.get(i) + (canvas.getWidth() / 14)) && (((i == 0) && x >= 0) || ((i != 0) && x > positionsX.get(i - 1) + (canvas.getWidth() / 14))))) {
-                for (int j = 0; j < positionsY.size(); j++)
-                    if (y == positionsY.get(j) || ((y <= positionsY.get(j) + canvas.getHeight() / 24) && ((j == 0 && y >= canvas.getHeight() / 4) || (j != 0 && y > positionsY.get(j - 1) + canvas.getHeight() / 24)))) {
+        for (int i = 0; i < Vault.positionsX.size(); i++) {
+            if (x == Vault.positionsX.get(i) || (x <= (Vault.positionsX.get(i) + (Vault.width / 14)) && (((i == 0) && x >= 0) || ((i != 0) && x > Vault.positionsX.get(i - 1) + (Vault.width / 14))))) {
+                for (int j = 0; j < Vault.positionsY.size(); j++)
+                    if (y == Vault.positionsY.get(j) || ((y <= Vault.positionsY.get(j) + Vault.height / 24) && ((j == 0 && y >= Vault.height / 4) || (j != 0 && y >  Vault.positionsY.get(j - 1) + Vault.height / 24)))) {
                         rF[0] = 1;
-                        rF[1] = (float) positionsX.get(i);
-                        rF[2] = (float) positionsY.get(j);
+                        rF[1] = (float) Vault.positionsX.get(i);
+                        rF[2] = (float) Vault.positionsY.get(j);
                         return rF;
                     }
             }
@@ -532,7 +514,7 @@ public class Game extends Activity {
 
     void botTurn() {
         if (turn) return;
-        if (positionsX != null) {
+        if (Vault.positionsX != null) {
             if (!newGame && !turn) {
                 Random r = new Random();
                 int x = 0;
@@ -607,14 +589,14 @@ public class Game extends Activity {
                         x = 3;
                         y = indexForY;
                     }
-                    while (positionsX != null) {
+                    while (Vault.positionsX != null) {
                         if ((gameMap[temp[0]][temp[1]]) != null && ((gameMap[temp[0]][temp[1]]).charAt(0) == 'F')) {
                             randomize = !canBotPlayhere(temp[0], temp[1]);
                             if (!randomize) break;
                         }
-                        x = r.nextInt(positionsX.size());
-                        y = r.nextInt(positionsY.size());
-                        temp = translate(positionsX.get(x), positionsY.get(y));
+                        x = r.nextInt(Vault.positionsX.size());
+                        y = r.nextInt(Vault.positionsY.size());
+                        temp = translate(Vault.positionsX.get(x), Vault.positionsY.get(y));
                     }
                 }
 
@@ -643,7 +625,7 @@ public class Game extends Activity {
                 };
                 moveAdders.add(ma);
                 ma.id = idForMoveAdders++;
-                ma.m = new Move(botColor, positionsX.get(x), positionsY.get(y));
+                ma.m = new Move(botColor, Vault.positionsX.get(x), Vault.positionsY.get(y));
                 ma.start();
                 turn = true;
                 colorOfPlayer = botColor;

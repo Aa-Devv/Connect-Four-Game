@@ -5,13 +5,14 @@ import android.content.res.Resources;
 import java.util.ArrayList;
 
 public class Vault {
-   static ArrayList<Float> positionsX = new ArrayList<>();
-  static ArrayList<Float> positionsY = new ArrayList<>();
-     ArrayList<Move> moves = new ArrayList<>();
+    static ArrayList<Float> positionsX = new ArrayList<>();
+    static ArrayList<Float> positionsY = new ArrayList<>();
+    static int height;
+    static int width;
     static void getPositions(){
         Float x,y=0f;
-        int height = Resources.getSystem().getDisplayMetrics().heightPixels;
-        int width = Resources.getSystem().getDisplayMetrics().widthPixels;
+         height = Resources.getSystem().getDisplayMetrics().heightPixels;
+         width = Resources.getSystem().getDisplayMetrics().widthPixels;
         y =  height / 24 + (height / 2) / 2.0f;
         for (int i = 0; i < 6; i++, y += height / 12) {
             positionsY.add(y);

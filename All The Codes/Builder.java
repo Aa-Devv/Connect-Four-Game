@@ -13,59 +13,69 @@ import android.view.View;
 
 import java.util.ArrayList;
 
-public class can extends View {
-    ArrayList<Float> positionsX = new ArrayList<>();
-    ArrayList<Float> positionsY = new ArrayList<>();
+public class Builder extends View {
     ArrayList<Move> moves = new ArrayList<>();
     Game game;
     Paint t = new Paint();
 
-    public can(Context context,Game game) {
+    public Builder(Context context,Game game) {
         super(context);
         this.game = game;
 
     }
 
-
+String translateNumber(long n){
+        if(n==0) return " ";
+        long numberOfFives = n/5;
+        String str = "";
+        for(long i=0;i<numberOfFives;i++){
+            str = str+"卌";
+        }
+    for(long i=0;i<n%5;i++){
+        str = str+"|";
+    }
+        return str;
+}
     void drawTheBackground(Canvas canvas) {
         float x = 0;
         float y = 0;
         t = new Paint();
-
+        int height = canvas.getHeight();
+        int width = canvas.getWidth();
         canvas.drawColor(Color.rgb(39, 69, 139));
         Rect r = new Rect();
-        r.set(0, 0, canvas.getWidth(), canvas.getHeight() / 4);
+        r.set(0, 0, width, height / 4);
         Paint bb = new Paint();
         bb.setColor(Color.BLACK);
         canvas.drawRect(r, bb);
-        r.set(0, canvas.getHeight() / 2 + canvas.getHeight() / 4, canvas.getWidth(), canvas.getHeight());
+        r.set(0, height / 2 + height / 4, width, height);
         canvas.drawRect(r, bb);
         t.setColor(Color.BLACK);
         t.setStrokeWidth(5);
-        canvas.drawLine(0, (canvas.getHeight() / 2) / 2, canvas.getWidth(), (canvas.getHeight() / 2) / 2, t);
-        x = canvas.getWidth() - 2;
-        y = (canvas.getHeight() / 2) / 2;
+        canvas.drawLine(0, (height / 2) / 2, width, (height / 2) / 2, t);
+        x = width - 2;
+        y = (height / 2) / 2;
         canvas.drawLine(x, y, x, y * 2 + y, t);
-        x = canvas.getWidth();
+        x = width;
         y = y * 2 + y;
         canvas.drawLine(x, y, 0, y, t);
         x = 0 + 2;
-        canvas.drawLine(x, y, x, (canvas.getHeight() / 2) / 2, t);
-        x = canvas.getWidth() / 7;
-        y = (canvas.getHeight() / 2) / 2;
-        for (int i = 0; i < 6; i++, x += canvas.getWidth() / 7)
+        canvas.drawLine(x, y, x, (height / 2) / 2, t);
+        x = width / 7;
+        y = (height / 2) / 2;
+        for (int i = 0; i < 6; i++, x += width / 7)
             canvas.drawLine(x, y, x, y * 2 + y, t);
-        x = canvas.getWidth();
-        y = canvas.getHeight() / 12 + (canvas.getHeight() / 2) / 2;
-        for (int i = 0; i < 5; i++, y += canvas.getHeight() / 12)
+        x = width;
+        y = height / 12 + (height / 2) / 2;
+        for (int i = 0; i < 5; i++, y += height / 12)
             canvas.drawLine(x, y, 0, y, t);
-        y = canvas.getHeight() / 24 + (canvas.getHeight() / 2) / 2;
+        y = height / 24 + (height / 2) / 2;
         t.setColor(Color.rgb(22, 40, 80));
-        for (int i = 0; i < 6; i++, y += canvas.getHeight() / 12) {
+        for (int i = 0; i < 6; i++, y += height / 12) {
             x = 0;
-            for (int j = 0; j < 7; j++, x += canvas.getWidth() / 7) {
-                Float pX = (canvas.getWidth() / 14) + x;
-                canvas.drawCircle((float) pX, y, (float) ((float) (canvas.getWidth() / 14) * .8), t);
+            for (int j = 0; j < 7; j++, x += width / 7) {
+                Float pX = (width / 14) + x;
+                canvas.drawCircle((float) pX, y, (float) ((float) (width / 14) * .8), t);
             }
         }
         Drawable dr = getResources().getDrawable(R.drawable._40);
@@ -79,26 +89,26 @@ public class can extends View {
         pforg.setColor(Color.rgb(255, 255, 255));
         canvas.drawBitmap(arrowback, 5, 5, pforg);
         pforg.setTextSize(50);
-        canvas.drawText("Wins: "+game.winScore,getWidth()/4,155,pforg);
-        canvas.drawText("Losses: "+game.loseScore,getWidth()/4,255,pforg);
-        canvas.drawText("Draws: "+game.drawScore,getWidth()/4,355,pforg);
+        canvas.drawText("Wins: "+translateNumber(game.winScore),getWidth()/4,155,pforg);
+        canvas.drawText("Losses: "+translateNumber(game.loseScore),getWidth()/4,255,pforg);
+        canvas.drawText("Draws: "+translateNumber(game.drawScore),getWidth()/4,355,pforg);
     }
 
     void drawMoves(Canvas canvas) {
+        int width = canvas.getWidth();
         t = new Paint();
         for (int i = 0; i < moves.size() - 1; i++) {
             if (moves.get(i).colorName.equalsIgnoreCase("R")) t.setColor(Color.rgb(195, 29, 43));
             else t.setColor(Color.rgb(255, 254, 13));
             t.setStrokeWidth(5);
-            canvas.drawCircle(moves.get(i).x, moves.get(i).y, (float) ((float) (canvas.getWidth() / 14) * .8), t);
+            canvas.drawCircle(moves.get(i).x, moves.get(i).y, (float) ((float) (width / 14) * .8), t);
             if(game.winningMoves.size()!=0){
                for(int j=0;j<game.winningMoves.size();j++){
                    if(Vault.positionsX.get(game.winningMoves.get(j).get(0))==moves.get(i).x&&Vault.positionsY.get(game.winningMoves.get(j).get(1))==moves.get(i).y){
-                       System.out.println("yes");
                        Paint w = new Paint();
                        w.setStyle(Paint.Style.STROKE);
                        w.setColor(Color.rgb(255,215,0));
-                       canvas.drawCircle(moves.get(i).x, moves.get(i).y, (float) ((float) (canvas.getWidth() / 14) * 1), w);
+                       canvas.drawCircle(moves.get(i).x, moves.get(i).y, (float) ((float) (width / 14) * 1), w);
                    }
                }
 
@@ -110,6 +120,7 @@ public class can extends View {
     float changingY = Vault.positionsY.get(0);
     @Override
     protected void onDraw(Canvas canvas) {
+        int width = canvas.getWidth();
         super.onDraw(canvas);
         drawTheBackground(canvas);
         drawMoves(canvas);
@@ -120,7 +131,7 @@ public class can extends View {
                 t.setColor(Color.rgb(195, 29, 43));
             else t.setColor(Color.rgb(255, 254, 13));
             t.setStrokeWidth(5);
-            canvas.drawCircle(moves.get(moves.size() - 1).x, changingY, (float) ((float) (canvas.getWidth() / 14) * .8), t);
+            canvas.drawCircle(moves.get(moves.size() - 1).x, changingY, (float) ((float) (width / 14) * .8), t);
             if(changingY>=moves.get(moves.size() - 1).y){
                 moves.get(moves.size()-1).done = true;
                 if(game.winningMoves.size()!=0){
@@ -129,7 +140,7 @@ public class can extends View {
                             Paint w = new Paint();
                             w.setStyle(Paint.Style.STROKE);
                             w.setColor(Color.rgb(255,215,0));
-                            canvas.drawCircle(moves.get(moves.size()-1).x, moves.get(moves.size()-1).y, (float) ((float) (canvas.getWidth() / 14) * 1), w);
+                            canvas.drawCircle(moves.get(moves.size()-1).x, moves.get(moves.size()-1).y, (float) ((float) (width / 14) * 1), w);
                         }
                     }
 
