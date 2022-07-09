@@ -18,24 +18,25 @@ public class Builder extends View {
     Game game;
     Paint t = new Paint();
 
-    public Builder(Context context,Game game) {
+    public Builder(Context context, Game game) {
         super(context);
         this.game = game;
 
     }
 
-String translateNumber(long n){
-        if(n==0) return " ";
-        long numberOfFives = n/5;
+    String translateNumber(long n) {
+        if (n == 0) return " ";
+        long numberOfFives = n / 5;
         String str = "";
-        for(long i=0;i<numberOfFives;i++){
-            str = str+"卌";
+        for (long i = 0; i < numberOfFives; i++) {
+            str = str + "卌";
         }
-    for(long i=0;i<n%5;i++){
-        str = str+"|";
-    }
+        for (long i = 0; i < n % 5; i++) {
+            str = str + "|";
+        }
         return str;
-}
+    }
+
     void drawTheBackground(Canvas canvas) {
         float x = 0;
         float y = 0;
@@ -80,18 +81,16 @@ String translateNumber(long n){
         }
         Drawable dr = getResources().getDrawable(R.drawable._40);
         Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
-// Scale it to 50 x 50
         Drawable d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 150, 150, true));
-// Set your new, scaled drawable "d"
         Bitmap arrowback = ((BitmapDrawable) d).getBitmap();
         r = new Rect();
         Paint pforg = new Paint();
         pforg.setColor(Color.rgb(255, 255, 255));
         canvas.drawBitmap(arrowback, 5, 5, pforg);
-        pforg.setTextSize(50);
-        canvas.drawText("Wins: "+translateNumber(game.winScore),getWidth()/4,155,pforg);
-        canvas.drawText("Losses: "+translateNumber(game.loseScore),getWidth()/4,255,pforg);
-        canvas.drawText("Draws: "+translateNumber(game.drawScore),getWidth()/4,355,pforg);
+        pforg.setTextSize(width / 20);
+        canvas.drawText("Wins: " + translateNumber(game.winScore), getWidth() / 4, 155, pforg);
+        canvas.drawText("Losses: " + translateNumber(game.loseScore), getWidth() / 4, 255, pforg);
+        canvas.drawText("Draws: " + translateNumber(game.drawScore), getWidth() / 4, 355, pforg);
     }
 
     void drawMoves(Canvas canvas) {
@@ -102,15 +101,16 @@ String translateNumber(long n){
             else t.setColor(Color.rgb(255, 254, 13));
             t.setStrokeWidth(5);
             canvas.drawCircle(moves.get(i).x, moves.get(i).y, (float) ((float) (width / 14) * .8), t);
-            if(game.winningMoves.size()!=0){
-               for(int j=0;j<game.winningMoves.size();j++){
-                   if(Vault.positionsX.get(game.winningMoves.get(j).get(0))==moves.get(i).x&&Vault.positionsY.get(game.winningMoves.get(j).get(1))==moves.get(i).y){
-                       Paint w = new Paint();
-                       w.setStyle(Paint.Style.STROKE);
-                       w.setColor(Color.rgb(255,215,0));
-                       canvas.drawCircle(moves.get(i).x, moves.get(i).y, (float) ((float) (width / 14) * 1), w);
-                   }
-               }
+            if (game.winningMoves.size() != 0) {
+                for (int j = 0; j < game.winningMoves.size(); j++) {
+                    if (Vault.positionsX.get(game.winningMoves.get(j).get(0)) == moves.get(i).x && Vault.positionsY.get(game.winningMoves.get(j).get(1)) == moves.get(i).y) {
+                        Paint w = new Paint();
+                        w.setStyle(Paint.Style.STROKE);
+                        w.setColor(Color.BLACK);
+                        w.setStrokeWidth(20);
+                        canvas.drawCircle(moves.get(i).x, moves.get(i).y, (float) ((float) (width / 14) * .8), w);
+                    }
+                }
 
             }
         }
@@ -118,6 +118,7 @@ String translateNumber(long n){
     }
 
     float changingY = Vault.positionsY.get(0);
+
     @Override
     protected void onDraw(Canvas canvas) {
         int width = canvas.getWidth();
@@ -126,34 +127,30 @@ String translateNumber(long n){
         drawMoves(canvas);
         t = new Paint();
         if (moves.size() != 0) {
-            if( moves.get(moves.size()-1).done) return;
+            if (moves.get(moves.size() - 1).done) return;
             if (moves.get(moves.size() - 1).colorName.equalsIgnoreCase("R"))
                 t.setColor(Color.rgb(195, 29, 43));
             else t.setColor(Color.rgb(255, 254, 13));
             t.setStrokeWidth(5);
             canvas.drawCircle(moves.get(moves.size() - 1).x, changingY, (float) ((float) (width / 14) * .8), t);
-            if(changingY>=moves.get(moves.size() - 1).y){
-                moves.get(moves.size()-1).done = true;
-                if(game.winningMoves.size()!=0){
-                    for(int j=0;j<game.winningMoves.size();j++){
-                        if(Vault.positionsX.get(game.winningMoves.get(j).get(0))==moves.get(moves.size()-1).x&&Vault.positionsY.get(game.winningMoves.get(j).get(1))==moves.get(moves.size()-1).y){
+            if (changingY >= moves.get(moves.size() - 1).y) {
+                moves.get(moves.size() - 1).done = true;
+                if (game.winningMoves.size() != 0) {
+                    for (int j = 0; j < game.winningMoves.size(); j++) {
+                        if (Vault.positionsX.get(game.winningMoves.get(j).get(0)) == moves.get(moves.size() - 1).x && Vault.positionsY.get(game.winningMoves.get(j).get(1)) == moves.get(moves.size() - 1).y) {
                             Paint w = new Paint();
                             w.setStyle(Paint.Style.STROKE);
-                            w.setColor(Color.rgb(255,215,0));
-                            canvas.drawCircle(moves.get(moves.size()-1).x, moves.get(moves.size()-1).y, (float) ((float) (width / 14) * 1), w);
+                            w.setColor(Color.BLACK);
+                            w.setStrokeWidth(20);
+                            canvas.drawCircle(moves.get(moves.size() - 1).x, moves.get(moves.size() - 1).y, (float) ((float) (width / 14) * .8), w);
                         }
                     }
 
                 }
                 changingY = Vault.positionsY.get(0);
-            }
-            else {
-                changingY+=((moves.get(moves.size() - 1).y-Vault.positionsY.get(0))/8);
+            } else {
+                changingY += ((moves.get(moves.size() - 1).y - Vault.positionsY.get(0)) / 8);
                 invalidate();
-                try{
-                Thread.sleep(50);
-            }catch (Exception e){
-                }
             }
 
         }

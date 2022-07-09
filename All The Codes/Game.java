@@ -155,7 +155,9 @@ public class Game extends Activity {
         if (!newGame && motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
             float[] rf = correctMove(motionEvent.getX(), motionEvent.getY() - tradeOff);
             int[] temp = translate(rf[1], rf[2]);
-            if (turn && rf[0] == 1 && checkColumn(temp[0])) {
+            int x = temp[0];
+            if (turn && rf[0] == 1 && checkColumn(x)) {
+                int y = indexForY;
                 MoveAdder ma = new MoveAdder() {
                     @Override
                     public void run() {
@@ -183,13 +185,13 @@ public class Game extends Activity {
                 };
                 moveAdders.add(ma);
                 ma.id = idForMoveAdders++;
-                ma.m = new Move(humanColor, rf[1], Vault.positionsY.get(indexForY));
+                ma.m = new Move(humanColor, Vault.positionsX.get(x), Vault.positionsY.get(y));
                 ma.start();
                 turn = false;
                 colorOfPlayer = humanColor;
-                gameMap[temp[0]][indexForY] = colorOfPlayer;
-                if ((indexForY - 1) >= 0) gameMap[temp[0]][indexForY - 1] = "F";
-                if (checkTheGame(temp[0], indexForY)) {
+                gameMap[x][y] = colorOfPlayer;
+                if (y != 0) gameMap[x][y - 1] = "F";
+                if (checkTheGame(x, y)) {
                     winScore++;
                     this.runOnUiThread(new Runnable() {
                         public void run() {
@@ -427,7 +429,7 @@ public class Game extends Activity {
         for (int i = 0; i < Vault.positionsX.size(); i++) {
             if (x == Vault.positionsX.get(i) || (x <= (Vault.positionsX.get(i) + (Vault.width / 14)) && (((i == 0) && x >= 0) || ((i != 0) && x > Vault.positionsX.get(i - 1) + (Vault.width / 14))))) {
                 for (int j = 0; j < Vault.positionsY.size(); j++)
-                    if (y == Vault.positionsY.get(j) || ((y <= Vault.positionsY.get(j) + Vault.height / 24) && ((j == 0 && y >= Vault.height / 4) || (j != 0 && y >  Vault.positionsY.get(j - 1) + Vault.height / 24)))) {
+                    if (y == Vault.positionsY.get(j) || ((y <= Vault.positionsY.get(j) + Vault.height / 24) && ((j == 0 && y >= Vault.height / 4) || (j != 0 && y > Vault.positionsY.get(j - 1) + Vault.height / 24)))) {
                         rF[0] = 1;
                         rF[1] = (float) Vault.positionsX.get(i);
                         rF[2] = (float) Vault.positionsY.get(j);
@@ -519,7 +521,6 @@ public class Game extends Activity {
                 Random r = new Random();
                 int x = 0;
                 int y = 0;
-                int[] temp = new int[2];
                 boolean randomize = true;
                 colorOfPlayer = humanColor;
                 for (int i = 0; i < gameMap.length; i++) {
@@ -527,12 +528,10 @@ public class Game extends Activity {
                     if (checkColumn(i)) {
                         gameMap[i][indexForY] = colorOfPlayer;
                         if (checkTheGame2(i, indexForY)) {
-                            temp[0] = i;
-                            temp[1] = indexForY;
                             x = i;
                             y = indexForY;
                             gameMap[i][indexForY] = "F";
-                            randomize = !canBotPlayhere(temp[0], temp[1]);
+                            randomize = !canBotPlayhere(x, y);
                             break;
                         }
                         gameMap[i][indexForY] = "F";
@@ -540,10 +539,8 @@ public class Game extends Activity {
                 }
                 if (pickTheMostTolerable) {
                     if (pickTheMostTolerable()[0] == 1) {
-                        temp[0] = pickTheMostTolerable()[1];
-                        temp[1] = pickTheMostTolerable()[2];
-                        x = temp[0];
-                        y = temp[1];
+                        x = pickTheMostTolerable()[1];
+                        y = pickTheMostTolerable()[2];
                     }
                 }
                 colorOfPlayer = humanColor;
@@ -552,8 +549,6 @@ public class Game extends Activity {
                     if (checkColumn(i)) {
                         gameMap[i][indexForY] = colorOfPlayer;
                         if (checkTheGame(i, indexForY)) {
-                            temp[0] = i;
-                            temp[1] = indexForY;
                             x = i;
                             y = indexForY;
                             gameMap[i][indexForY] = "F";
@@ -569,8 +564,6 @@ public class Game extends Activity {
                     if (checkColumn(i)) {
                         gameMap[i][indexForY] = colorOfPlayer;
                         if (checkTheGame(i, indexForY)) {
-                            temp[0] = i;
-                            temp[1] = indexForY;
                             x = i;
                             y = indexForY;
                             randomize = false;
@@ -584,19 +577,16 @@ public class Game extends Activity {
                 if (randomize) {
                     if (checkColumn(3) && gameMap[3][indexForY] != null && gameMap[3][indexForY].equalsIgnoreCase("F")) {
                         //if the middle column is avaliable it get played in
-                        temp[0] = 3;
-                        temp[1] = indexForY;
                         x = 3;
                         y = indexForY;
                     }
                     while (Vault.positionsX != null) {
-                        if ((gameMap[temp[0]][temp[1]]) != null && ((gameMap[temp[0]][temp[1]]).charAt(0) == 'F')) {
-                            randomize = !canBotPlayhere(temp[0], temp[1]);
+                        if ((gameMap[x][y]) != null && ((gameMap[x][y]).charAt(0) == 'F')) {
+                            randomize = !canBotPlayhere(x, y);
                             if (!randomize) break;
                         }
-                        x = r.nextInt(Vault.positionsX.size());
-                        y = r.nextInt(Vault.positionsY.size());
-                        temp = translate(Vault.positionsX.get(x), Vault.positionsY.get(y));
+                        x = r.nextInt(gameMap.length);
+                        y = r.nextInt(gameMap[0].length);
                     }
                 }
 
@@ -630,8 +620,8 @@ public class Game extends Activity {
                 turn = true;
                 colorOfPlayer = botColor;
                 gameMap[x][y] = colorOfPlayer;
-                if ((y - 1) >= 0) gameMap[x][y - 1] = "F";
-                if (checkTheGame(temp[0], temp[1])) {
+                if (y != 0) gameMap[x][y - 1] = "F";
+                if (checkTheGame(x, y)) {
                     loseScore++;
                     this.runOnUiThread(new Runnable() {
                         public void run() {
