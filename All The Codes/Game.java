@@ -1,11 +1,8 @@
 package com.example.connectfour;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -26,9 +23,7 @@ public class Game extends Activity {
     ArrayList<String> colorsOfPlayers = new ArrayList();
     ArrayList<MoveAdder> moveAdders = new ArrayList<>();
     ArrayList<ArrayList<Integer>> winningMoves = new ArrayList<>();
-    long winScore;
-    long loseScore;
-    long drawScore;
+    String colorOfWinner;
 
 
     @Override
@@ -36,9 +31,6 @@ public class Game extends Activity {
         colorsOfPlayers = new ArrayList();
         colorsOfPlayers.add("R");
         colorsOfPlayers.add("Y");
-        winScore = 0;
-        loseScore = 0;
-        drawScore = 0;
         if (getIntent().getExtras().get("yellow").toString().equalsIgnoreCase("true")) {
             turn = false;
             humanColor = "Y";
@@ -49,29 +41,52 @@ public class Game extends Activity {
             turn = true;
         }
         super.onCreate(savedInstanceState);
-        Vault.getPositions();
         canvas = new Builder(this, this);
         setContentView(canvas);
-        startGame();
+        (new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (!Vault.sealed) {
+
+                }
+                startGame();
+            }
+        })).start();
     }
 
 
     void startGame() {
+        Thread a = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (moveAdders.size() != 0) while (!moveAdders.get(moveAdders.size() - 1).m.done) {
+                }
+            }
+        });
+        a.start();
+        try {
+            a.join();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         gameMap = new String[7][6];
-        for (int i = 0; i < moveAdders.size(); i++) {
-            if (moveAdders.get(i).isAlive()) {
-                moveAdders.get(i).interrupt();
-            }
-        }
         moveAdders = new ArrayList<>();
         winningMoves = new ArrayList<>();
         idForMoveAdders = 0;
         emptyTheFirstRow();
         canvas.moves = new ArrayList<>();
         turn = !getIntent().getExtras().get("yellow").toString().equalsIgnoreCase("true");
+        newGame = false;
         botTurn();
-        canvas.invalidate();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                canvas.invalidate();
+            }
+        });
+
+        theViewIsBusy = false;
     }
 
     void sendGame() {
@@ -95,18 +110,28 @@ public class Game extends Activity {
         return false;
     }
 
+    boolean theViewIsBusy;
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (theViewIsBusy) {
+            return true;
+        }
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            double tradeOff = canvas.getPivotY() / 7.6176;
-            if ((event.getY() - tradeOff < 155) && event.getX() < 155) {
+            double tradeOff = Vault.width / 8;
+            if ((event.getY() - tradeOff < Vault.width / 8) && event.getX() < Vault.width / 8) {
                 finish();
                 return true;
             }
 
             if (newGame) {
-                newGame = false;
-                startGame();
+                (new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        startGame();
+                    }
+                })).start();
+                theViewIsBusy = true;
                 return true;
             }
             Thread humanPlayer = new Thread(new Runnable() {
@@ -120,6 +145,7 @@ public class Game extends Activity {
                     humanPlayer.start();
                     humanPlayer.join();
                 }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -141,7 +167,7 @@ public class Game extends Activity {
                     if (t0 != null) t0.cancel();
                     t0 = t0.makeText(Game.this, "It's a draw!", Toast.LENGTH_SHORT);
                     t0.show();
-                    drawScore++;
+                    Vault.drawScore++;
                 }
             });
             newGame = true;
@@ -192,7 +218,7 @@ public class Game extends Activity {
                 gameMap[x][y] = colorOfPlayer;
                 if (y != 0) gameMap[x][y - 1] = "F";
                 if (checkTheGame(x, y)) {
-                    winScore++;
+                    Vault.winScore++;
                     this.runOnUiThread(new Runnable() {
                         public void run() {
                             if (t0 != null) t0.cancel();
@@ -261,9 +287,11 @@ public class Game extends Activity {
                 ArrayList<Integer> a = new ArrayList();
                 a.add(i);
                 a.add(y);
+                colorOfWinner = colorOfPlayer;
                 winningMoves.add(a);
             } else {
                 winningCounts = 0;
+                colorOfWinner = "F";
                 winningMoves = new ArrayList<>();
             }
             if (winningCounts == 4)
@@ -272,6 +300,7 @@ public class Game extends Activity {
         ArrayList<Integer> a = new ArrayList();
         a.add(x);
         a.add(y);
+        colorOfWinner = colorOfPlayer;
         winningMoves.add(a);
         winningCounts = 1;
         for (int i = 1; i < 4; i++) {
@@ -283,6 +312,7 @@ public class Game extends Activity {
                 winningMoves.add(a);
             } else {
                 winningCounts = 0;
+                colorOfWinner = "F";
                 winningMoves = new ArrayList<>();
             }
             if (winningCounts == 4)
@@ -292,6 +322,7 @@ public class Game extends Activity {
         a = new ArrayList();
         a.add(x);
         a.add(y);
+        colorOfWinner = colorOfPlayer;
         winningMoves.add(a);
         winningCounts = 1;
         for (int i = 1, j = 1; x + i < gameMap.length && y + j < gameMap[0].length; i++, j++) {
@@ -321,6 +352,7 @@ public class Game extends Activity {
         a = new ArrayList();
         a.add(x);
         a.add(y);
+        colorOfWinner = colorOfPlayer;
         winningMoves.add(a);
         winningCounts = 1;
         for (int i = 1, j = 1; x + i < gameMap.length && y - j >= 0; i++, j++) {
@@ -346,7 +378,10 @@ public class Game extends Activity {
         }
         if (winningCounts == 4)
             return true;
-        else winningMoves = new ArrayList<>();
+        else {
+            colorOfWinner = "F";
+            winningMoves = new ArrayList<>();
+        }
         return false;
 
     }
@@ -622,7 +657,7 @@ public class Game extends Activity {
                 gameMap[x][y] = colorOfPlayer;
                 if (y != 0) gameMap[x][y - 1] = "F";
                 if (checkTheGame(x, y)) {
-                    loseScore++;
+                    Vault.loseScore++;
                     this.runOnUiThread(new Runnable() {
                         public void run() {
                             if (t0 != null) t0.cancel();

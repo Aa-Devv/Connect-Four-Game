@@ -2,7 +2,6 @@ package com.example.connectfour;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -24,18 +23,6 @@ public class Builder extends View {
 
     }
 
-    String translateNumber(long n) {
-        if (n == 0) return " ";
-        long numberOfFives = n / 5;
-        String str = "";
-        for (long i = 0; i < numberOfFives; i++) {
-            str = str + "卌";
-        }
-        for (long i = 0; i < n % 5; i++) {
-            str = str + "|";
-        }
-        return str;
-    }
 
     void drawTheBackground(Canvas canvas) {
         float x = 0;
@@ -43,6 +30,10 @@ public class Builder extends View {
         t = new Paint();
         int height = canvas.getHeight();
         int width = canvas.getWidth();
+        if (!Vault.sealed) {
+            Vault.setPositions(height, width);
+            changingY = Vault.positionsY.get(0);
+        }
         canvas.drawColor(Color.rgb(39, 69, 139));
         Rect r = new Rect();
         r.set(0, 0, width, height / 4);
@@ -81,16 +72,17 @@ public class Builder extends View {
         }
         Drawable dr = getResources().getDrawable(R.drawable._40);
         Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
-        Drawable d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 150, 150, true));
+        Drawable d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, (width / 8), (width / 8), true));
         Bitmap arrowback = ((BitmapDrawable) d).getBitmap();
         r = new Rect();
         Paint pforg = new Paint();
         pforg.setColor(Color.rgb(255, 255, 255));
         canvas.drawBitmap(arrowback, 5, 5, pforg);
         pforg.setTextSize(width / 20);
-        canvas.drawText("Wins: " + translateNumber(game.winScore), getWidth() / 4, 155, pforg);
-        canvas.drawText("Losses: " + translateNumber(game.loseScore), getWidth() / 4, 255, pforg);
-        canvas.drawText("Draws: " + translateNumber(game.drawScore), getWidth() / 4, 355, pforg);
+        pforg.setStyle(Paint.Style.FILL);
+        canvas.drawText("Wins: " + Vault.winScore, getWidth() / 4, (height / 24) + height / 20, pforg);
+        canvas.drawText("Losses: " + Vault.loseScore, getWidth() / 4, (height / 24) + 2 * (height / 20), pforg);
+        canvas.drawText("Draws: " + Vault.drawScore, getWidth() / 4, (height / 24) + 3 * (height / 20), pforg);
     }
 
     void drawMoves(Canvas canvas) {
@@ -101,23 +93,11 @@ public class Builder extends View {
             else t.setColor(Color.rgb(255, 254, 13));
             t.setStrokeWidth(5);
             canvas.drawCircle(moves.get(i).x, moves.get(i).y, (float) ((float) (width / 14) * .8), t);
-            if (game.winningMoves.size() != 0) {
-                for (int j = 0; j < game.winningMoves.size(); j++) {
-                    if (Vault.positionsX.get(game.winningMoves.get(j).get(0)) == moves.get(i).x && Vault.positionsY.get(game.winningMoves.get(j).get(1)) == moves.get(i).y) {
-                        Paint w = new Paint();
-                        w.setStyle(Paint.Style.STROKE);
-                        w.setColor(Color.BLACK);
-                        w.setStrokeWidth(20);
-                        canvas.drawCircle(moves.get(i).x, moves.get(i).y, (float) ((float) (width / 14) * .8), w);
-                    }
-                }
-
-            }
         }
 
     }
 
-    float changingY = Vault.positionsY.get(0);
+    float changingY;
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -134,19 +114,21 @@ public class Builder extends View {
             t.setStrokeWidth(5);
             canvas.drawCircle(moves.get(moves.size() - 1).x, changingY, (float) ((float) (width / 14) * .8), t);
             if (changingY >= moves.get(moves.size() - 1).y) {
-                moves.get(moves.size() - 1).done = true;
-                if (game.winningMoves.size() != 0) {
-                    for (int j = 0; j < game.winningMoves.size(); j++) {
-                        if (Vault.positionsX.get(game.winningMoves.get(j).get(0)) == moves.get(moves.size() - 1).x && Vault.positionsY.get(game.winningMoves.get(j).get(1)) == moves.get(moves.size() - 1).y) {
-                            Paint w = new Paint();
-                            w.setStyle(Paint.Style.STROKE);
-                            w.setColor(Color.BLACK);
-                            w.setStrokeWidth(20);
-                            canvas.drawCircle(moves.get(moves.size() - 1).x, moves.get(moves.size() - 1).y, (float) ((float) (width / 14) * .8), w);
+                if (game.winningMoves.size() != 0 && moves.size() == game.moveAdders.size()) {
+                    for (int i = 0; i < moves.size(); i++) {
+                        for (int j = 0; j < game.winningMoves.size(); j++) {
+                            if (moves.get(i).x == Vault.positionsX.get(game.winningMoves.get(j).get(0)) && moves.get(i).y == Vault.positionsY.get(game.winningMoves.get(j).get(1))) {
+                                Paint w = new Paint();
+                                w.setStyle(Paint.Style.STROKE);
+                                w.setColor(Color.BLACK);
+                                w.setStrokeWidth(20);
+                                canvas.drawCircle(moves.get(i).x, moves.get(i).y, (float) ((float) (width / 14) * .8), w);
+                            }
                         }
                     }
 
                 }
+                moves.get(moves.size() - 1).done = true;
                 changingY = Vault.positionsY.get(0);
             } else {
                 changingY += ((moves.get(moves.size() - 1).y - Vault.positionsY.get(0)) / 8);
