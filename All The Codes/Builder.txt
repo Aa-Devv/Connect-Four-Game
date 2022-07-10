@@ -16,6 +16,7 @@ public class Builder extends View {
     ArrayList<Move> moves = new ArrayList<>();
     Game game;
     Paint t = new Paint();
+    boolean firstTime = true;
 
     public Builder(Context context, Game game) {
         super(context);
@@ -32,7 +33,10 @@ public class Builder extends View {
         int width = canvas.getWidth();
         if (!Vault.sealed) {
             Vault.setPositions(height, width);
+        }
+        if (firstTime) {
             changingY = Vault.positionsY.get(0);
+            firstTime = false;
         }
         canvas.drawColor(Color.rgb(39, 69, 139));
         Rect r = new Rect();
