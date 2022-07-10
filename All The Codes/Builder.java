@@ -24,6 +24,7 @@ public class Builder extends View {
 
     }
 
+    float radius;
 
     void drawTheBackground(Canvas canvas) {
         float x = 0;
@@ -36,6 +37,10 @@ public class Builder extends View {
         }
         if (firstTime) {
             changingY = Vault.positionsY.get(0);
+            radius = (float) ((float) (width / 14) * .8);
+            if (radius > height / 28) {
+                radius = height / 28;
+            }
             firstTime = false;
         }
         canvas.drawColor(Color.rgb(39, 69, 139));
@@ -71,7 +76,7 @@ public class Builder extends View {
             x = 0;
             for (int j = 0; j < 7; j++, x += width / 7) {
                 Float pX = (width / 14) + x;
-                canvas.drawCircle((float) pX, y, (float) ((float) (width / 14) * .8), t);
+                canvas.drawCircle((float) pX, y, radius, t);
             }
         }
         Drawable dr = getResources().getDrawable(R.drawable._40);
@@ -96,7 +101,7 @@ public class Builder extends View {
             if (moves.get(i).colorName.equalsIgnoreCase("R")) t.setColor(Color.rgb(195, 29, 43));
             else t.setColor(Color.rgb(255, 254, 13));
             t.setStrokeWidth(5);
-            canvas.drawCircle(moves.get(i).x, moves.get(i).y, (float) ((float) (width / 14) * .8), t);
+            canvas.drawCircle(moves.get(i).x, moves.get(i).y, radius, t);
         }
 
     }
@@ -116,7 +121,7 @@ public class Builder extends View {
                 t.setColor(Color.rgb(195, 29, 43));
             else t.setColor(Color.rgb(255, 254, 13));
             t.setStrokeWidth(5);
-            canvas.drawCircle(moves.get(moves.size() - 1).x, changingY, (float) ((float) (width / 14) * .8), t);
+            canvas.drawCircle(moves.get(moves.size() - 1).x, changingY, radius, t);
             if (changingY >= moves.get(moves.size() - 1).y) {
                 if (game.winningMoves.size() != 0 && moves.size() == game.moveAdders.size()) {
                     for (int i = 0; i < moves.size(); i++) {
@@ -126,7 +131,7 @@ public class Builder extends View {
                                 w.setStyle(Paint.Style.STROKE);
                                 w.setColor(Color.BLACK);
                                 w.setStrokeWidth(20);
-                                canvas.drawCircle(moves.get(i).x, moves.get(i).y, (float) ((float) (width / 14) * .8), w);
+                                canvas.drawCircle(moves.get(i).x, moves.get(i).y, radius, w);
                             }
                         }
                     }
