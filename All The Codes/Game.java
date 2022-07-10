@@ -278,7 +278,6 @@ public class Game extends Activity {
 
     boolean checkTheGame(int x, int y) {
         winningMoves = new ArrayList<>();
-        //set the position above the piece that was just played to F
         //declare winner
         int winningCounts = 0;
         for (int i = 0; i < gameMap.length; i++) {
@@ -346,7 +345,7 @@ public class Game extends Activity {
             } else break;
 
         }
-        if (winningCounts == 4)
+        if (winningCounts >= 4)
             return true;
         winningMoves = new ArrayList<>();
         a = new ArrayList();
@@ -376,7 +375,7 @@ public class Game extends Activity {
             } else break;
 
         }
-        if (winningCounts == 4)
+        if (winningCounts >= 4)
             return true;
         else {
             colorOfWinner = "F";
@@ -387,8 +386,6 @@ public class Game extends Activity {
     }
 
     boolean checkTheGame2(int x, int y) {
-        //set the position above the piece that was just played to F
-        //declare winner
         int winningCounts = 0;
         for (int i = 0; i < gameMap.length; i++) {
             if (gameMap[i][y] != null && gameMap[i][y].equalsIgnoreCase(colorOfPlayer))
