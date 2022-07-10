@@ -14,10 +14,34 @@
 
 
     <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textView3"
+        android:background="#000000"
+        android:text="TextView"
+        android:textAlignment="textStart"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textView2"
+        android:background="#000000"
+        android:text="TextView"
+        android:textAlignment="textStart"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:visibility="invisible" />
+
+    <TextView
         android:id="@+id/Welcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/b"
+        android:layout_above="@+id/toggleButton2"
         android:layout_centerInParent="true"
         android:layout_marginBottom="20dp"
         android:text="Connect Four!"
@@ -33,9 +57,10 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:backgroundTint="#00FF00"
+        android:layout_below="@+id/toggleButton2"
         android:clickable="true"
         android:onClick="buttonP"
-        android:text="Hit me to start game!"
+        android:text="Start Game!"
         android:textColor="@color/black"
         android:textSize="15sp" />
 
@@ -44,7 +69,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_below="@+id/b"
         android:background="#FFFF00"
         android:textAlignment="center"
         android:textOff="AS YELLOW"
@@ -52,5 +76,16 @@
         android:textColor="@color/black"
         android:onClick="buttonC"
         android:textSize="15sp"/>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#000000"
+        android:text="TextView"
+        android:textAlignment="textStart"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:visibility="invisible" />
 
 </RelativeLayout>

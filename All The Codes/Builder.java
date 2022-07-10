@@ -87,11 +87,6 @@ public class Builder extends View {
         Paint pforg = new Paint();
         pforg.setColor(Color.rgb(255, 255, 255));
         canvas.drawBitmap(arrowback, 5, 5, pforg);
-        pforg.setTextSize(width / 20);
-        pforg.setStyle(Paint.Style.FILL);
-        canvas.drawText("Wins: " + Vault.winScore, getWidth() / 4, (height / 24) + height / 20, pforg);
-        canvas.drawText("Losses: " + Vault.loseScore, getWidth() / 4, (height / 24) + 2 * (height / 20), pforg);
-        canvas.drawText("Draws: " + Vault.drawScore, getWidth() / 4, (height / 24) + 3 * (height / 20), pforg);
     }
 
     void drawMoves(Canvas canvas) {

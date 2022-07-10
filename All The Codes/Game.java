@@ -1,6 +1,7 @@
 package com.example.connectfour;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.widget.Toast;
@@ -120,6 +121,11 @@ public class Game extends Activity {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             double tradeOff = Vault.width / 8;
             if ((event.getY() - tradeOff < Vault.width / 8) && event.getX() < Vault.width / 8) {
+                Intent i = new Intent(this, MainActivity.class);
+                i.putExtra("w", Vault.winScore);
+                i.putExtra("l", Vault.loseScore);
+                i.putExtra("d", Vault.drawScore);
+                setResult(RESULT_OK, i);
                 finish();
                 return true;
             }
